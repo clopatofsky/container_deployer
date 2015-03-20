@@ -30,15 +30,92 @@ debugme() {
   [[ $DEBUG = 1 ]] && "$@" || :
 }
 
-export -f debugme 
+installwithpython27() {
+    echo "Installing Python 2.7"
+    sudo apt-get update &> /dev/null
+    sudo apt-get -y install python2.7 &> /dev/null
+    python --version 
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py &> /dev/null
+    python get-pip.py --user &> /dev/null
+    export PATH=$PATH:~/.local/bin
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip &> /dev/null
+    pip install --user icecli-2.0.zip
+}
+installwithpython34() {
+    curl -kL http://xrl.us/pythonbrewinstall | bash
+    source $HOME/.pythonbrew/etc/bashrc
+    sudo apt-get install zlib1g-dev libexpat1-dev libdb4.8-dev libncurses5-dev libreadline6-dev
+    sudo apt-get update &> /dev/null
+    debugme pythonbrew list -k
+    echo "Installing Python 3.4.1"
+    pythonbrew install 3.4.1 &> /dev/null
+    debugme cat /home/jenkins/.pythonbrew/log/build.log 
+    pythonbrew switch 3.4.1
+    python --version 
+    echo "Installing pip"
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py &> /dev/null
+    python get-pip.py --user
+    export PATH=$PATH:~/.local/bin
+    which pip 
+    echo "Installing ice cli"
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip &> /dev/null
+    pip install --user icecli-2.0.zip
+}
 
-if [ $DEBUG -eq 1 ]; then 
+installwithpython277() {
+    pushd . 
+    cd $EXT_DIR
+    echo "Installing Python 2.7.7"
+    curl -kL http://xrl.us/pythonbrewinstall | bash
+    source $HOME/.pythonbrew/etc/bashrc
+
+    sudo apt-get update &> /dev/null
+    sudo apt-get build-dep python2.7
+    sudo apt-get install zlib1g-dev
+    debugme pythonbrew list -k
+    echo "Installing Python 2.7.7"
+    pythonbrew install 2.7.7 --no-setuptools &> /dev/null
+    debugme cat /home/jenkins/.pythonbrew/log/build.log 
+    pythonbrew switch 2.7.7
+    python --version 
+    echo "Installing pip"
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py &> /dev/null
+    python get-pip.py --user &> /dev/null
+    debugme pwd 
+    debugme ls 
+    popd 
+    pip remove requests
+    pip install --user -U requests 
+    pip install --user -U pip
+    export PATH=$PATH:~/.local/bin
+    which pip 
+    echo "Installing ice cli"
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip &> /dev/null
+    pip install --user icecli-2.0.zip > cli_install.log 2>&1 
+    debugme echo cli_install.log 
+}
+installwithpython3() {
+
+    sudo apt-get update &> /dev/null
+    sudo apt-get upgrade &> /dev/null 
+    sudo apt-get -y install python3 &> /dev/null
+    python3 --version 
+    echo "installing pip"
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
+    python3 get-pip.py --user &> /dev/null
+    export PATH=$PATH:~/.local/bin
+    which pip 
+    echo "installing ice cli"
+
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+    pip install --user icecli-2.0.zip > cli_install.log 2>&1 
+    debugme echo cli_install.log 
+}
+if [[ $DEBUG = 1 ]]; then 
     export ICE_ARGS="--verbose"
 else
     export ICE_ARGS=""
 fi 
-
-export LOG_DIR=$EXT_DIR
 
 set +e
 set +x 
@@ -53,18 +130,14 @@ fi
 ######################
 # Install ICE CLI    #
 ######################
-echo "installing ICE CLI"
+echo "Installing IBM Container Service CLI"
 ice help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
-    pushd . 
-    cd $EXT_DIR
-    sudo apt-get update &> /dev/null
-    sudo apt-get -y install python2.7 &> /dev/null
-    python --version 
-    python get-pip.py --user &> /dev/null
-    export PATH=$PATH:~/.local/bin
-    pip install --user icecli-2.0.zip
+#    installwithpython3
+    installwithpython27
+#    installwithpython277
+#    installwithpython34
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
@@ -72,9 +145,8 @@ if [ $RESULT -ne 0 ]; then
         debugme python --version
         exit $RESULT
     fi
-    popd 
     echo -e "${label_color}Successfully installed IBM Container Service CLI ${no_color}"
-fi
+fi 
 
 #############################
 # Install Cloud Foundry CLI #
@@ -128,7 +200,6 @@ fi
 ################################
 # Login to Container Service   #
 ################################
-debugme echo "BLUEMIX_TARGET: $BLUEMIX_TARGET"
 if [ -n "$API_KEY" ]; then 
     echo -e "${label_color}Logging on with API_KEY${no_color}"
     debugme echo "Login command: ice $ICE_ARGS login --key ${API_KEY}"
@@ -155,7 +226,7 @@ elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
         echo -e "${label_color} Using ${BLUEMIX_SPACE} for Bluemix space, please set BLUEMIX_SPACE if on the environment if you wish to change this. ${no_color} "
     fi 
     echo -e "${label_color}Targetting information.  Can be updated by setting environment variables${no_color}"
-    echo "BLUEMIX_USER: ${BLUEMIX_SPACE}"
+    echo "BLUEMIX_USER: ${BLUEMIX_USER}"
     echo "BLUEMIX_SPACE: ${BLUEMIX_SPACE}"
     echo "BLUEMIX_ORG: ${BLUEMIX_ORG}"
     echo "BLUEMIX_PASSWORD: xxxxx"
@@ -174,19 +245,39 @@ else
     debugme echo "config.json:"
     debugme cat /home/jenkins/.cf/config.json | cut -c1-2
     debugme cat /home/jenkins/.cf/config.json | cut -c3-
-    ice --verbose ps > ps.log 
-    debugme cat ps.log 
+    debugme echo "testing ice login via ice info command"
+    ice --verbose info > info.log 
     RESULT=$?
-    if [ $RESULT -ne 0 ]; then
-        echo "checking login to registry server" 
+    debugme cat info.log 
+    if [ $RESULT -eq 0 ]; then
+        echo "ice info was successful.  Checking login to registry server" 
         ice images &> /dev/null
         RESULT=$? 
+    else 
+        echo "ice info did not return successfully.  Login failed."
     fi 
 fi 
+
+printEnablementInfo() {
+    echo -e "${label_color}No namespace has been defined for this user ${no_color}"
+    echo -e "${label_color}A common cause of this is when the user has not been enabled for IBM Containers on Bluemix${no_color}"
+    echo -e "Please check the following: "
+    echo -e "   - Login to Bluemix (https://console.ng.bluemix.net)"
+    echo -e "   - Select the 'IBM Containers' icon from the Dashboard" 
+    echo -e "   - Select 'Create a Container'"
+    echo -e "" 
+    echo -e "If there is a message indicating that your account needs to be enabled for IBM Containers, confirm that you would like to do so, and wait for confirmation that your account has been enabled"
+}
+
 
 # check login result 
 if [ $RESULT -eq 1 ]; then
     echo -e "${red}Failed to login to IBM Container Service${no_color}"
+    ice namespace get 
+    HAS_NAMESPACE=$?
+    if [ $HAS_NAMESPACE -eq 1 ]; then 
+        printEnablementInfo        
+    fi 
     exit $RESULT
 else 
     echo -e "${green}Successfully logged into IBM Container Service${no_color}"
