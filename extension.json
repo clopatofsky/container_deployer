@@ -1,6 +1,6 @@
 {
     "id": "ibm.devops.services.pipeline.docker.deploy.ice",
-    "version": 1,
+    "version": 2,
     "name_key": "ExtName",
     "desc_key": "ExtDesc",
     "extension_type": "Deploy",

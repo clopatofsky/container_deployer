@@ -20,12 +20,10 @@ export CONTAINER_NAME="removeme"
 export DEPLOY_TYPE="simple"
 export REGISTRY_URL="registry-ice.ng.bluemix.net/icedevops"
 export API_URL="https://api-ice.ng.bluemix.net/v1.0"
-export BUILDER="http://198.23.108.133"
 export APPLICATION_NAME="helloworld"
 export WORKSPACE="/Users/robbie/experiments/docker-demo/mynodeapplication2"
 export EXT_DIR="/Users/robbie/experiments/docker-demo/github/pipeline_service_docker_deployer_rest"
 export ARCHIVE_DIR="/tmp/archive"
-export API_KEY="07889a87b6429714618fe23153c20e00cf02724573dedc9e"
 export DEBUG=1
 export IMAGE_NAME="registry-ice.ng.bluemix.net/icedevops/helloworld:latest"
 
