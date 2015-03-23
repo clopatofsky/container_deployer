@@ -39,7 +39,9 @@ installwithpython27() {
     python get-pip.py --user &> /dev/null
     export PATH=$PATH:~/.local/bin
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip &> /dev/null
-    pip install --user icecli-2.0.zip
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+    pip install --user icecli-2.0.zip > cli_install.log 2>&1 
+    debugme cat cli_install.log 
 }
 installwithpython34() {
     curl -kL http://xrl.us/pythonbrewinstall | bash
@@ -59,7 +61,9 @@ installwithpython34() {
     which pip 
     echo "Installing ice cli"
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip &> /dev/null
-    pip install --user icecli-2.0.zip
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+    pip install --user icecli-2.0.zip > cli_install.log 2>&1 
+    debugme cat cli_install.log 
 }
 
 installwithpython277() {
@@ -92,7 +96,7 @@ installwithpython277() {
     echo "Installing ice cli"
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip &> /dev/null
     pip install --user icecli-2.0.zip > cli_install.log 2>&1 
-    debugme echo cli_install.log 
+    debugme cat cli_install.log 
 }
 installwithpython3() {
 
@@ -109,7 +113,7 @@ installwithpython3() {
 
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
     pip install --user icecli-2.0.zip > cli_install.log 2>&1 
-    debugme echo cli_install.log 
+    debugme cat cli_install.log 
 }
 if [[ $DEBUG = 1 ]]; then 
     export ICE_ARGS="--verbose"
@@ -143,6 +147,7 @@ if [ $RESULT -ne 0 ]; then
     if [ $RESULT -ne 0 ]; then
         echo -e "${red}Failed to install IBM Container Service CLI ${no_color}"
         debugme python --version
+        ${EXT_DIR}/print_help.sh
         exit $RESULT
     fi
     echo -e "${label_color}Successfully installed IBM Container Service CLI ${no_color}"
@@ -160,7 +165,8 @@ cf help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
     echo -e "${red}Could not install the cloud foundry CLI ${no_color}"
-    exit 1
+    ${EXT_DIR}/print_help.sh
+    exit $RESULT
 fi  
 popd
 echo -e "${label_color}Successfully installed Cloud Foundry CLI ${no_color}"
@@ -185,6 +191,7 @@ if [ -n "$BLUEMIX_TARGET" ]; then
 
     else 
         echo -e "${red}Unknown Bluemix environment specified"
+        ${EXT_DIR}/print_help.sh
         exit 1
     fi 
 else 
@@ -204,17 +211,19 @@ if [ -n "$API_KEY" ]; then
     echo -e "${label_color}Logging on with API_KEY${no_color}"
     debugme echo "Login command: ice $ICE_ARGS login --key ${API_KEY}"
     #ice $ICE_ARGS login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} 
-    ice $ICE_ARGS login --key ${API_KEY}
+    ice $ICE_ARGS login --key ${API_KEY} 2> /dev/null
     RESULT=$?
 elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     # need to gather information from the environment 
     # Get the Bluemix user and password information 
     if [ -z "$BLUEMIX_USER" ]; then 
         echo -e "${red} Please set BLUEMIX_USER on environment ${no_color} "
+        ${EXT_DIR}/print_help.sh
         exit 1
     fi 
     if [ -z "$BLUEMIX_PASSWORD" ]; then 
         echo -e "${red} Please set BLUEMIX_PASSWORD as an environment property environment ${no_color} "
+        ${EXT_DIR}/print_help.sh
         exit 1 
     fi 
     if [ -z "$BLUEMIX_ORG" ]; then 
@@ -233,7 +242,7 @@ elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     echo ""
     echo -e "${label_color}Logging in to Bluemix and IBM Container Service using environment properties${no_color}"
     debugme echo "login command: ice $ICE_ARGS login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}"
-    ice $ICE_ARGS login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} 
+    ice $ICE_ARGS login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} 2> /dev/null
     RESULT=$?
 else 
     # we are already logged in.  Simply check via ice command 
@@ -246,7 +255,7 @@ else
     debugme cat /home/jenkins/.cf/config.json | cut -c1-2
     debugme cat /home/jenkins/.cf/config.json | cut -c3-
     debugme echo "testing ice login via ice info command"
-    ice --verbose info > info.log 
+    ice --verbose info > info.log 2> /dev/null
     RESULT=$?
     debugme cat info.log 
     if [ $RESULT -eq 0 ]; then
@@ -273,15 +282,16 @@ printEnablementInfo() {
 # check login result 
 if [ $RESULT -eq 1 ]; then
     echo -e "${red}Failed to login to IBM Container Service${no_color}"
-    ice namespace get 
+    ice namespace get 2> /dev/null
     HAS_NAMESPACE=$?
     if [ $HAS_NAMESPACE -eq 1 ]; then 
         printEnablementInfo        
     fi 
+    ${EXT_DIR}/print_help.sh
     exit $RESULT
 else 
     echo -e "${green}Successfully logged into IBM Container Service${no_color}"
-    ice info 
+    ice info 2> /dev/null
 fi 
 
 ##############################
@@ -302,6 +312,7 @@ if [ -z $IMAGE_NAME ]; then
     fi  
     if [ -z $IMAGE_NAME ]; then
         echo -e "${red}IMAGE_NAME not set.  Set the IMAGE_NAME in the environment or provide a Docker build job as input to this deploy job ${no_label}"
+        ${EXT_DIR}/print_help.sh
         exit 1
     fi 
 else 

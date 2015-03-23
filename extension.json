@@ -74,6 +74,7 @@ RESULT=$?
 
 if [ $RESULT -ne 0 ]; then
     echo -e \"${red}Executed failed or had warnings ${no_color}\"
+    ${EXT_DIR}/print_help.sh
     exit $RESULT
 fi 
 echo -e \"${green}Execution complete${no_label}\"",
