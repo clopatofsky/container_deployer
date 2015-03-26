@@ -4,6 +4,7 @@
     "name_key": "ExtName",
     "desc_key": "ExtDesc",
     "extension_type": "Deploy",
+    "message_key": "ExtMessage",
     "inputs": [
         {
             "type": "Artifacts",
@@ -57,7 +58,7 @@ git clone https://github.com/Osthanes/deployscripts.git deployscripts
 # Deploy with containers (optionally define BIND_TO on the environment to bind an application with services) 
 /bin/bash deployscripts/deploycontainer.sh 
 
-# Deploy Container Group (define ROUTE_HOSTNAME, ROUTE_DOMAIN, BIND_TO, DESIRED on the environment 
+# Deploy Container Group (optionally define ROUTE_HOSTNAME, ROUTE_DOMAIN, BIND_TO, DESIRED on the environment)
 # IF YOU WANT CONTAINER GROUPS .. uncomment the next line, and comment out the previous deployment line (/bin/bash deployscripts/deploygroup.sh)
 #/bin/bash deployscripts/deploygroup.sh 
 
