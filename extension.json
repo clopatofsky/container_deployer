@@ -54,14 +54,27 @@ git clone https://github.com/Osthanes/deployscripts.git deployscripts
 # You can deploy your Image as either a single Container or as a Container Group.  A Container Group deploys a number of containers which is defined by the GROUP_DESIRED property on the Stage.
 # By default we will deploy as a single container
 
-
-# Deploy with containers (optionally define BIND_TO on the environment to bind an application with services)
+# Deploy with containers:
+# Optional environment properties:
+#      NAME              Value         Description
+#   =============      =========     ==============
+#   BIND_TO             String       Specify a Bluemix application name.
 /bin/bash deployscripts/deploycontainer.sh
 
-# Deploy Container Group (optionally define ROUTE_HOSTNAME, ROUTE_DOMAIN, BIND_TO, DESIRED, AUTO_RECOVERY on the environment)
+# Deploy Container Group:
+# Optional environment properties:
+#      NAME              Value         Description
+#   =============      =========     ==============
+#   ROUTE_HOSTNAME      String       Specify the Host name.
+#   ROUTE_DOMAIN        String       Specify domain name. You can choose either a domain that
+#                                    exists in your Bluemix space, or assign a new domain.
+#                                    Default is mybluemix.net.
+#   BIND_TO             String       Specify a Bluemix application name.
+#   DESIRED_INSTANCES:  Number       Specify the number of instances in the group.
+#   AUTO_RECOVERY:      Boolean      Set auto-recovery to true/false.
+#                                    Default is false.
 # IF YOU WANT CONTAINER GROUPS .. uncomment the next line, and comment out the previous deployment line (/bin/bash deployscripts/deploygroup.sh)
 #/bin/bash deployscripts/deploygroup.sh
-
 
 RESULT=$?
 
