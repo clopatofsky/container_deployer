@@ -59,6 +59,9 @@ git clone https://github.com/Osthanes/deployscripts.git deployscripts
 #      NAME              Value         Description
 #   =============      =========     ==============
 #   BIND_TO             String       Specify a Bluemix application name that whose bound services you wish to make available to the container.  By default this is not set. 
+#   CONTAINER_SIZE      String       Specify container size: m1.tiny (256), m1.small (512), m1.medium (1024), m1.large (2048).
+#                                    Default is m1.tiny (256).
+#
 /bin/bash deployscripts/deploycontainer.sh
 
 # Deploy Container Group:
@@ -71,6 +74,9 @@ git clone https://github.com/Osthanes/deployscripts.git deployscripts
 #   DESIRED_INSTANCES:  Number       Specify the number of instances in the group.  Default value is 1.  
 #   AUTO_RECOVERY:      Boolean      Set auto-recovery to true/false.  Default value is false. 
 
+#                                    Default is false.
+#   CONTAINER_SIZE      String       Specify container size: m1.tiny (256), m1.small (512), m1.medium (1024), m1.large (2048).
+#                                    Default is m1.tiny (256).
 # IF YOU WANT CONTAINER GROUPS .. uncomment the next line, and comment out the previous deployment line (/bin/bash deployscripts/deploygroup.sh)
 #/bin/bash deployscripts/deploygroup.sh
 
