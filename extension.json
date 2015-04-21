@@ -41,6 +41,14 @@
             "desc_key": "PORT_DESC"
         },
         {
+            "name": "OPTIONAL_ARGS",
+            "type": "Text",
+            "required": "false",
+            "default_value": "",
+            "label_key": "ARGS_KEY",
+            "desc_key": "ARGS_DESC"
+        },
+        {
             "name": "COMMAND",
             "type": "TextArea",
             "required": "true",
@@ -98,14 +106,6 @@ fi
 echo -e \"${green}Execution complete${no_label}\"",
             "label_key": "COMMAND_KEY",
             "desc_key": "COMMAND_DESC"
-        },
-        {
-            "name": "OPTIONAL_ARGS",
-            "type": "Text",
-            "required": "false",
-            "default_value": "",
-            "label_key": "ARGS_KEY",
-            "desc_key": "ARGS_DESC"
         }
     ],
     "outputs": [
@@ -117,8 +117,8 @@ set +x
 set +e
 export DEPLOY_TYPE=#DEPLOY_TYPE#
 export CONTAINER_NAME=#CONTAINER_NAME#
-export PORT="#PORT#"
-export OPTIONAL_ARGS="#OPTIONAL_ARGS#"
+export PORT=\"#PORT#\"
+export OPTIONAL_ARGS=\"#OPTIONAL_ARGS#\"
 . $EXT_DIR/_init.sh
 /bin/bash -e #COMMAND#"
     }
