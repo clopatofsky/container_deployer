@@ -195,7 +195,7 @@ if [ -n "$BLUEMIX_TARGET" ]; then
         export ICE_CFG="ice-cfg-prod.ini"
 
     else 
-        echo -e "${red}Unknown Bluemix environment specified"
+        echo -e "${red}Unknown Bluemix environment specified${no_color}"
         ${EXT_DIR}/print_help.sh
         exit 1
     fi 
@@ -316,13 +316,19 @@ if [ -z $IMAGE_NAME ]; then
         echo "IMAGE_NAME: $IMAGE_NAME"
     fi  
     if [ -z $IMAGE_NAME ]; then
-        echo -e "${red}IMAGE_NAME not set.  Set the IMAGE_NAME in the environment or provide a Docker build job as input to this deploy job ${no_label}"
+        echo -e "${red}IMAGE_NAME not set.  Set the IMAGE_NAME in the environment or provide a Docker build job as input to this deploy job ${no_color}"
         ${EXT_DIR}/print_help.sh
         exit 1
     fi 
 else 
     echo -e "${label_color}Image being overridden by the environment.  Using ${IMAGE_NAME} ${no_color}"
 fi 
+
+
+########################
+# Setup git_retry      #
+########################
+source ${EXT_DIR}/git_util.sh
 
 ########################
 # Current Limitations  #
