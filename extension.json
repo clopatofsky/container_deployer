@@ -58,8 +58,8 @@ echo -e \"${label_color}Starting deployment script${no_color}\"
 
 
 # To view/fork this script goto: https://github.com/Osthanes/deployscripts
-# git_retry will retry git to prevent pipeline failure on temporary github problems
-# the code can be found in git_util.sh in https://github.com/Osthanes/container_deployer
+# git_retry will retry git calls to prevent pipeline failure on temporary github problems
+# the code can be found in git_util.sh at https://github.com/Osthanes/container_deployer
 git_retry clone https://github.com/Osthanes/deployscripts.git deployscripts
 
 
