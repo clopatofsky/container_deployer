@@ -233,11 +233,11 @@ elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     fi 
     if [ -z "$BLUEMIX_ORG" ]; then 
         export BLUEMIX_ORG=$BLUEMIX_USER
-        echo -e "${label_color} Using ${BLUEMIX_ORG} for Bluemix organization, please set BLUEMIX_ORG if on the environment if you wish to change this. ${no_color} "
+        echo -e "${label_color} Using ${BLUEMIX_ORG} for Bluemix organization, please set BLUEMIX_ORG on the environment if you wish to change this. ${no_color} "
     fi 
     if [ -z "$BLUEMIX_SPACE" ]; then
         export BLUEMIX_SPACE="dev"
-        echo -e "${label_color} Using ${BLUEMIX_SPACE} for Bluemix space, please set BLUEMIX_SPACE if on the environment if you wish to change this. ${no_color} "
+        echo -e "${label_color} Using ${BLUEMIX_SPACE} for Bluemix space, please set BLUEMIX_SPACE on the environment if you wish to change this. ${no_color} "
     fi 
     echo -e "${label_color}Targetting information.  Can be updated by setting environment variables${no_color}"
     echo "BLUEMIX_USER: ${BLUEMIX_USER}"
@@ -330,6 +330,22 @@ fi
 ########################
 source ${EXT_DIR}/git_util.sh
 
+################################
+# get the extensions utilities #
+################################
+pushd . >/dev/null
+cd $EXT_DIR 
+#git_retry clone https://github.com/Osthanes/utilities.git utilities
+git_retry clone https://github.com/jgarcows/utilities.git utilities
+popd >/dev/null
+
+############################
+# enable logging to logmet #
+############################
+source $EXT_DIR/utilities/logging_utils.sh
+setup_met_logging "${BLUEMIX_USER}" "${BLUEMIX_PASSWORD}" "${BLUEMIX_SPACE}" "${BLUEMIX_ORG}" "${BLUEMIX_TARGET}"
+
+
 ########################
 # Current Limitations  #
 ########################
@@ -345,10 +361,10 @@ fi
 ########################
 sudo apt-get install bc > /dev/null 
 if [ -n "$BUILD_OFFSET" ]; then 
-    echo "Using BUILD_OFFSET of $BUILD_OFFSET"
+    log_and_echo INFO "Using BUILD_OFFSET of $BUILD_OFFSET"
     export APPLICATION_VERSION=$(echo "$APPLICATION_VERSION + $BUILD_OFFSET" | bc)
     export BUILD_NUMBER=$(echo "$BUILD_NUMBER + $BUILD_OFFSET" | bc)
 fi 
 
-echo -e "${label_color}Initialization complete ${no_color}"
+log_and_echo LABEL "Initialization complete"
 
