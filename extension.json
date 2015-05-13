@@ -56,26 +56,12 @@
 # The following are some example deployment scripts.  Use these as is or fork them and include your updates here:
 echo -e \"${label_color}Starting deployment script${no_color}\"
 
+
 # To view/fork this script goto: https://github.com/Osthanes/deployscripts
-GIT_CLONE=\"git clone https://github.com/Osthanes/deployscripts.git deployscripts\"
+# git_retry will retry git calls in case of errors
+# the code can be found in git_util.sh in https://github.com/Osthanes/container_deployer
+git_retry clone https://github.com/Osthanes/deployscripts.git deployscripts
 
-echo $GIT_CLONE
-$GIT_CLONE
-GIT_RC=$?
-GIT_RETRY_COUNT=0
-GIT_RETRY_MAX=5
-while [[  $GIT_RETRY_COUNT -lt $GIT_RETRY_MAX && $GIT_RC -ne 0 ]]; do
-    ((GIT_RETRY_COUNT++))
-    echo -e \"${label_color}git clone command failed; retrying in 30 seconds${no_color} ($GIT_RETRY_COUNT of $GIT_RETRY_MAX)\"
-    sleep 30
-    echo $GIT_CLONE
-    $GIT_CLONE
-    GIT_RC=$?
-done
-
-if [ $GIT_RC -ne 0 ]; then
-    echo -e \"${red}git clone command failed; unable to download deploy scripts${no_color}\"
-fi
 
 # You can deploy your Image as either a single Container or as a Container Group.  A Container Group deploys a number of containers which is defined by the GROUP_DESIRED property on the Stage.
 # By default we will deploy as a single container
