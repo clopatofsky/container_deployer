@@ -27,7 +27,7 @@ echo -e "${label_color}We are sorry you are having trouble. ${no_color}"
 
 if [ -n "$ERROR_LOG_FILE" ]; then
     if [ -e "${ERROR_LOG_FILE}" ]; then
-        local ERROR_COUNT=`wc "${ERROR_LOG_FILE}" | awk '{print $1}'` 
+        ERROR_COUNT=`wc "${ERROR_LOG_FILE}" | awk '{print $1}'` 
         if [ ${ERROR_COUNT} -eq 1 ]; then
             echo -e "${label_color}There was ${ERROR_COUNT} error recorded during execution:${no_color}"
         else
