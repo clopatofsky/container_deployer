@@ -361,10 +361,10 @@ fi
 ########################
 sudo apt-get install bc > /dev/null 
 if [ -n "$BUILD_OFFSET" ]; then 
-    log_and_echo INFO "Using BUILD_OFFSET of $BUILD_OFFSET"
+    log_and_echo "$INFO" "Using BUILD_OFFSET of $BUILD_OFFSET"
     export APPLICATION_VERSION=$(echo "$APPLICATION_VERSION + $BUILD_OFFSET" | bc)
     export BUILD_NUMBER=$(echo "$BUILD_NUMBER + $BUILD_OFFSET" | bc)
 fi 
 
-log_and_echo LABEL "Initialization complete"
+log_and_echo "$LABEL" "Initialization complete"
 
