@@ -40,7 +40,7 @@ git_retry() {
     done
 
     if [ $GIT_RC -ne 0 ]; then
-        echo -e "${red}git command failed${no_color}"
+        echo -e "${red}git command failed: $GIT_CALL${no_color}" | tee -a "$ERROR_LOG_FILE"
     fi
 }
 
