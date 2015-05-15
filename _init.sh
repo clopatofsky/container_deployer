@@ -136,6 +136,14 @@ if [ -n $EXT_DIR ]; then
     export PATH=$EXT_DIR:$PATH
 fi 
 
+#########################################
+# Configure log file to store errors  #
+#########################################
+if [ -z "$ERROR_LOG_FILE" ]; then
+    ERROR_LOG_FILE="${EXT_DIR}/errors.log"
+    export ERROR_LOG_FILE
+fi
+
 ######################
 # Install ICE CLI    #
 ######################
@@ -150,7 +158,7 @@ if [ $RESULT -ne 0 ]; then
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
-        echo -e "${red}Failed to install IBM Container Service CLI ${no_color}"
+        echo -e "${red}Failed to install IBM Container Service CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
         debugme python --version
         ${EXT_DIR}/print_help.sh
         exit $RESULT
@@ -169,7 +177,7 @@ tar -xvf cf-linux-amd64.tar  &> /dev/null
 cf help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
-    echo -e "${red}Could not install the cloud foundry CLI ${no_color}"
+    echo -e "${red}Could not install the cloud foundry CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
     ${EXT_DIR}/print_help.sh
     exit $RESULT
 fi  
@@ -195,7 +203,7 @@ if [ -n "$BLUEMIX_TARGET" ]; then
         export ICE_CFG="ice-cfg-prod.ini"
 
     else 
-        echo -e "${red}Unknown Bluemix environment specified${no_color}"
+        echo -e "${red}Unknown Bluemix environment specified${no_color}" | tee -a "$ERROR_LOG_FILE"
         ${EXT_DIR}/print_help.sh
         exit 1
     fi 
@@ -222,22 +230,22 @@ elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     # need to gather information from the environment 
     # Get the Bluemix user and password information 
     if [ -z "$BLUEMIX_USER" ]; then 
-        echo -e "${red} Please set BLUEMIX_USER on environment ${no_color} "
+        echo -e "${red} Please set BLUEMIX_USER on environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
         ${EXT_DIR}/print_help.sh
         exit 1
     fi 
     if [ -z "$BLUEMIX_PASSWORD" ]; then 
-        echo -e "${red} Please set BLUEMIX_PASSWORD as an environment property environment ${no_color} "
+        echo -e "${red} Please set BLUEMIX_PASSWORD as an environment property environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
         ${EXT_DIR}/print_help.sh
         exit 1 
     fi 
     if [ -z "$BLUEMIX_ORG" ]; then 
         export BLUEMIX_ORG=$BLUEMIX_USER
-        echo -e "${label_color} Using ${BLUEMIX_ORG} for Bluemix organization, please set BLUEMIX_ORG if on the environment if you wish to change this. ${no_color} "
+        echo -e "${label_color} Using ${BLUEMIX_ORG} for Bluemix organization, please set BLUEMIX_ORG on the environment if you wish to change this. ${no_color} "
     fi 
     if [ -z "$BLUEMIX_SPACE" ]; then
         export BLUEMIX_SPACE="dev"
-        echo -e "${label_color} Using ${BLUEMIX_SPACE} for Bluemix space, please set BLUEMIX_SPACE if on the environment if you wish to change this. ${no_color} "
+        echo -e "${label_color} Using ${BLUEMIX_SPACE} for Bluemix space, please set BLUEMIX_SPACE on the environment if you wish to change this. ${no_color} "
     fi 
     echo -e "${label_color}Targetting information.  Can be updated by setting environment variables${no_color}"
     echo "BLUEMIX_USER: ${BLUEMIX_USER}"
@@ -286,7 +294,7 @@ printEnablementInfo() {
 
 # check login result 
 if [ $RESULT -eq 1 ]; then
-    echo -e "${red}Failed to login to IBM Container Service${no_color}"
+    echo -e "${red}Failed to login to IBM Container Service${no_color}" | tee -a "$ERROR_LOG_FILE"
     ice namespace get 2> /dev/null
     HAS_NAMESPACE=$?
     if [ $HAS_NAMESPACE -eq 1 ]; then 
@@ -316,7 +324,7 @@ if [ -z $IMAGE_NAME ]; then
         echo "IMAGE_NAME: $IMAGE_NAME"
     fi  
     if [ -z $IMAGE_NAME ]; then
-        echo -e "${red}IMAGE_NAME not set.  Set the IMAGE_NAME in the environment or provide a Docker build job as input to this deploy job ${no_color}"
+        echo -e "${red}IMAGE_NAME not set.  Set the IMAGE_NAME in the environment or provide a Docker build job as input to this deploy job ${no_color}" | tee -a "$ERROR_LOG_FILE"
         ${EXT_DIR}/print_help.sh
         exit 1
     fi 
@@ -329,6 +337,21 @@ fi
 # Setup git_retry      #
 ########################
 source ${EXT_DIR}/git_util.sh
+
+################################
+# get the extensions utilities #
+################################
+pushd . >/dev/null
+cd $EXT_DIR 
+git_retry clone https://github.com/Osthanes/utilities.git utilities
+popd >/dev/null
+
+############################
+# enable logging to logmet #
+############################
+source $EXT_DIR/utilities/logging_utils.sh
+setup_met_logging "${BLUEMIX_USER}" "${BLUEMIX_PASSWORD}" "${BLUEMIX_SPACE}" "${BLUEMIX_ORG}" "${BLUEMIX_TARGET}"
+
 
 ########################
 # Current Limitations  #
@@ -345,10 +368,10 @@ fi
 ########################
 sudo apt-get install bc > /dev/null 
 if [ -n "$BUILD_OFFSET" ]; then 
-    echo "Using BUILD_OFFSET of $BUILD_OFFSET"
+    log_and_echo "$INFO" "Using BUILD_OFFSET of $BUILD_OFFSET"
     export APPLICATION_VERSION=$(echo "$APPLICATION_VERSION + $BUILD_OFFSET" | bc)
     export BUILD_NUMBER=$(echo "$BUILD_NUMBER + $BUILD_OFFSET" | bc)
 fi 
 
-echo -e "${label_color}Initialization complete ${no_color}"
+log_and_echo "$LABEL" "Initialization complete"
 
