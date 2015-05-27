@@ -37,7 +37,7 @@ if [ -n "$ERROR_LOG_FILE" ]; then
     fi
 fi
 
-echo -e "Typically a failed deploy can happen for a number of reasons.Please refer to IBM Bluemix Container Troubleshooting page ${label_color} https://www.ng.bluemix.net/docs/starters/container_troubleshoot.html ${no_color}."  
+echo -e "Typically a failed deploy can happen for a number of reasons.  Please refer to IBM Bluemix Container Troubleshooting page ${label_color} https://www.ng.bluemix.net/docs/starters/container_troubleshoot.html ${no_color}"  
 echo -e "If you would like to remove a number of containers change the deployment strategy on the job to 'clean' which will get rid of all but the last deployment."
 echo -e "There are a number of ways that you can get help:"
 echo -e "1. Post a question on ${label_color} https://developer.ibm.com/answers/ ${no_color} and 'Ask a question' with tags 'docker', 'containers' and 'devops-services'"
