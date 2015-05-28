@@ -24,7 +24,21 @@ export label_color='\e[0;33m'
 export no_color='\e[0m' # No Color
 
 echo -e "${label_color}We are sorry you are having trouble. ${no_color}"
-echo -e "Typically a failed deploy can happen for a number of reasons.  We leave any containers that have been deployed up so that they can be diagnosed.  If you would like to remove a number of containers change the deployment strategy on the job to clean which will get rid of all but the last deployment."
+
+if [ -n "$ERROR_LOG_FILE" ]; then
+    if [ -e "${ERROR_LOG_FILE}" ]; then
+        ERROR_COUNT=`wc "${ERROR_LOG_FILE}" | awk '{print $1}'` 
+        if [ ${ERROR_COUNT} -eq 1 ]; then
+            echo -e "${label_color}There was ${ERROR_COUNT} error recorded during execution:${no_color}"
+        else
+            echo -e "${label_color}There were ${ERROR_COUNT} errors recorded during execution:${no_color}"
+        fi
+        cat "${ERROR_LOG_FILE}"
+    fi
+fi
+
+echo -e "Typically a failed deploy can happen for a number of reasons.  Please refer to IBM Bluemix Container Troubleshooting page ${label_color} https://www.ng.bluemix.net/docs/starters/container_troubleshoot.html ${no_color}"  
+echo -e "If you would like to remove a number of containers change the deployment strategy on the job to 'clean' which will get rid of all but the last deployment."
 echo -e "There are a number of ways that you can get help:"
 echo -e "1. Post a question on ${label_color} https://developer.ibm.com/answers/ ${no_color} and 'Ask a question' with tags 'docker', 'containers' and 'devops-services'"
 echo -e "2. Open a Work Item in our public devops project: ${label_color} https://hub.jazz.net/project/alchemy/Alchemy-Ostanes ${no_color}"
