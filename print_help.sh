@@ -36,11 +36,9 @@ if [ -n "$ERROR_LOG_FILE" ]; then
         cat "${ERROR_LOG_FILE}"
     fi
 fi
-
-echo -e "Typically a failed deploy can happen for a number of reasons.  Please refer to IBM Bluemix Container Troubleshooting page ${label_color} https://www.ng.bluemix.net/docs/starters/container_troubleshoot.html ${no_color}"  
-echo -e "If you would like to remove a number of containers change the deployment strategy on the job to 'clean' which will get rid of all but the last deployment."
-echo -e "There are a number of ways that you can get help:"
-echo -e "1. Post a question on ${label_color} https://developer.ibm.com/answers/ ${no_color} and 'Ask a question' with tags 'docker', 'containers' and 'devops-services'"
-echo -e "2. Open a Work Item in our public devops project: ${label_color} https://hub.jazz.net/project/alchemy/Alchemy-Ostanes ${no_color}"
+echo
+echo -e "For additional help:"
+echo -e "1. Fork and explore sample scripts from: ${label_color} https://github.com/Osthanes ${no_color}"
+echo -e "2. Post a question on ${label_color} https://developer.ibm.com/answers/ ${no_color} and tag your question with 'docker', 'containers' and 'devops-services'"
+echo -e "3. Open a work item in the Alchemy-Osthanes project: ${label_color} https://hub.jazz.net/project/alchemy/Alchemy-Ostanes ${no_color}"
 echo 
-echo -e "You can also review and fork our sample scripts on ${label_color} https://github.com/Osthanes ${no_color}"
