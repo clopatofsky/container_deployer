@@ -63,8 +63,11 @@ echo -e \"${label_color}Starting deployment script${no_color}\"
 git_retry clone https://github.com/Osthanes/deployscripts.git deployscripts
 
 
-# You can deploy your Image as either a single Container or as a Container Group.  A Container Group deploys a number of containers which is defined by the GROUP_DESIRED property on the Stage.
-# By default we will deploy as a single container
+# You can deploy your Image as either a single Container or as a Container 
+# Group.  A Container Group deploys a number of containers to enhance
+# scalability or reliability.  By default we will deploy as a single 
+# container.  To switch to a group deploy, comment out the line below
+# containing deploycontainer.sh and uncomment the line for deploygroup.sh
 
 # Deploy with containers:
 # Optional environment properties (can be set directly in this script, or defined as environment properties):
@@ -73,6 +76,8 @@ git_retry clone https://github.com/Osthanes/deployscripts.git deployscripts
 #   BIND_TO             String       Specify a Bluemix application name that whose bound services you wish to make available to the container.  By default this is not set.
 #   CONTAINER_SIZE      String       Specify container size: m1.tiny (256), m1.small (512), m1.medium (1024), m1.large (2048).
 #                                    Default is m1.tiny (256).
+#   CONCURRENT_VERSIONS Number       Number of versions of this container to leave active.  
+#                                    Default is 1
 #
 /bin/bash deployscripts/deploycontainer.sh
 
@@ -89,6 +94,8 @@ git_retry clone https://github.com/Osthanes/deployscripts.git deployscripts
 #                                    Default is false.
 #   CONTAINER_SIZE      String       Specify container size: m1.tiny (256), m1.small (512), m1.medium (1024), m1.large (2048).
 #                                    Default is m1.tiny (256).
+#   CONCURRENT_VERSIONS Number       Number of versions of this group to leave active.
+#                                    Default is 1
 # IF YOU WANT CONTAINER GROUPS .. uncomment the next line, and comment out the previous deployment line (/bin/bash deployscripts/deploygroup.sh)
 #/bin/bash deployscripts/deploygroup.sh
 
