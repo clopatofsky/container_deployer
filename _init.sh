@@ -158,12 +158,12 @@ if [ $RESULT -ne 0 ]; then
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
-        echo -e "${red}Failed to install IBM Container Service CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
+        echo -e "${red}Failed to install IBM Containers CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
         debugme python --version
         ${EXT_DIR}/print_help.sh
         exit $RESULT
     fi
-    echo -e "${label_color}Successfully installed IBM Container Service CLI ${no_color}"
+    echo -e "${label_color}Successfully installed IBM Containers CLI ${no_color}"
 fi 
 
 #############################
@@ -177,7 +177,7 @@ tar -xvf cf-linux-amd64.tar  &> /dev/null
 cf help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
-    echo -e "${red}Could not install the cloud foundry CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
+    echo -e "${red}Could not install the Cloud Foundry CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
     ${EXT_DIR}/print_help.sh
     exit $RESULT
 fi  
@@ -253,13 +253,13 @@ elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     echo "BLUEMIX_ORG: ${BLUEMIX_ORG}"
     echo "BLUEMIX_PASSWORD: xxxxx"
     echo ""
-    echo -e "${label_color}Logging in to Bluemix and IBM Container Service using environment properties${no_color}"
+    echo -e "${label_color}Logging in to Bluemix and IBM Containers using environment properties${no_color}"
     debugme echo "login command: ice $ICE_ARGS login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}"
     ice $ICE_ARGS login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} 2> /dev/null
     RESULT=$?
 else 
     # we are already logged in.  Simply check via ice command 
-    echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
+    echo -e "${label_color}Logging into IBM Containers on Bluemix using credentials passed from IBM DevOps Services ${no_color}"
     mkdir -p ~/.ice
     debugme cat "${EXT_DIR}/${ICE_CFG}"
     cp ${EXT_DIR}/${ICE_CFG} ~/.ice/ice-cfg.ini
@@ -272,11 +272,11 @@ else
     RESULT=$?
     debugme cat info.log 
     if [ $RESULT -eq 0 ]; then
-        echo "ice info was successful.  Checking login to registry server" 
+        echo "ice info was successful. Checking login to registry server" 
         ice images &> /dev/null
         RESULT=$? 
     else 
-        echo "ice info did not return successfully.  Login failed."
+        echo "ice info did not return successfully. Login failed."
     fi 
 fi 
 
@@ -284,7 +284,7 @@ printEnablementInfo() {
     echo -e "${label_color}No namespace has been defined for this user ${no_color}"
     echo -e "${label_color}A common cause of this is when the user has not been enabled for IBM Containers on Bluemix${no_color}"
     echo -e "Please check the following: "
-    echo -e "   - Login to Bluemix (https://console.ng.bluemix.net)"
+    echo -e "   - Log in to Bluemix (https://console.ng.bluemix.net)"
     echo -e "   - Select the 'IBM Containers' icon from the Dashboard" 
     echo -e "   - Select 'Create a Container'"
     echo -e "" 
@@ -294,7 +294,7 @@ printEnablementInfo() {
 
 # check login result 
 if [ $RESULT -eq 1 ]; then
-    echo -e "${red}Failed to login to IBM Container Service${no_color}" | tee -a "$ERROR_LOG_FILE"
+    echo -e "${red}Failed to log in to IBM Container Service${no_color}" | tee -a "$ERROR_LOG_FILE"
     ice namespace get 2> /dev/null
     HAS_NAMESPACE=$?
     if [ $HAS_NAMESPACE -eq 1 ]; then 
@@ -303,7 +303,7 @@ if [ $RESULT -eq 1 ]; then
     ${EXT_DIR}/print_help.sh
     exit $RESULT
 else 
-    echo -e "${green}Successfully logged into IBM Container Service${no_color}"
+    echo -e "${green}Successfully logged in to IBM Containers${no_color}"
     ice info 2> /dev/null
 fi 
 
@@ -324,12 +324,12 @@ if [ -z $IMAGE_NAME ]; then
         echo "IMAGE_NAME: $IMAGE_NAME"
     fi  
     if [ -z $IMAGE_NAME ]; then
-        echo -e "${red}IMAGE_NAME not set.  Set the IMAGE_NAME in the environment or provide a Docker build job as input to this deploy job ${no_color}" | tee -a "$ERROR_LOG_FILE"
+        echo -e "${red}IMAGE_NAME not set. Set the IMAGE_NAME in the environment or provide a Docker build job as input to this deploy job ${no_color}" | tee -a "$ERROR_LOG_FILE"
         ${EXT_DIR}/print_help.sh
         exit 1
     fi 
 else 
-    echo -e "${label_color}Image being overridden by the environment.  Using ${IMAGE_NAME} ${no_color}"
+    echo -e "${label_color}Image being overridden by the environment. Using ${IMAGE_NAME} ${no_color}"
 fi 
 
 
