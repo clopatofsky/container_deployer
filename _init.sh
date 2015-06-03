@@ -72,8 +72,7 @@ installwithpython34() {
 }
 
 installwithpython277() {
-    pushd . 
-    cd $EXT_DIR
+    pushd $EXT_DIR >/dev/null
     echo "Installing Python 2.7.7"
     curl -kL http://xrl.us/pythonbrewinstall | bash
     source $HOME/.pythonbrew/etc/bashrc
@@ -92,7 +91,7 @@ installwithpython277() {
     python get-pip.py --user &> /dev/null
     debugme pwd 
     debugme ls 
-    popd 
+    popd >/dev/null
     pip remove requests
     pip install --user -U requests 
     pip install --user -U pip
@@ -170,8 +169,7 @@ fi
 # Install Cloud Foundry CLI #
 #############################
 echo "Installing Cloud Foundry CLI"
-pushd . 
-cd $EXT_DIR 
+pushd $EXT_DIR >/dev/null
 gunzip cf-linux-amd64.tgz &> /dev/null
 tar -xvf cf-linux-amd64.tar  &> /dev/null
 cf help &> /dev/null
@@ -181,7 +179,7 @@ if [ $RESULT -ne 0 ]; then
     ${EXT_DIR}/print_help.sh
     exit $RESULT
 fi  
-popd
+popd >/dev/null
 echo -e "${label_color}Successfully installed Cloud Foundry CLI ${no_color}"
 
 #################################
@@ -216,6 +214,10 @@ else
 
 fi  
 
+########################
+# Setup git_retry      #
+########################
+source ${EXT_DIR}/git_util.sh
 
 ################################
 # Login to Container Service   #
@@ -268,7 +270,7 @@ else
     debugme cat /home/jenkins/.cf/config.json | cut -c1-2
     debugme cat /home/jenkins/.cf/config.json | cut -c3-
     debugme echo "testing ice login via ice info command"
-    ice --verbose info > info.log 2> /dev/null
+    with_retry ice --verbose info > info.log 2> /dev/null
     RESULT=$?
     debugme cat info.log 
     if [ $RESULT -eq 0 ]; then
@@ -333,16 +335,10 @@ else
 fi 
 
 
-########################
-# Setup git_retry      #
-########################
-source ${EXT_DIR}/git_util.sh
-
 ################################
 # get the extensions utilities #
 ################################
-pushd . >/dev/null
-cd $EXT_DIR 
+pushd $EXT_DIR >/dev/null
 git_retry clone https://github.com/Osthanes/utilities.git utilities
 popd >/dev/null
 
