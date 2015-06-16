@@ -58,7 +58,7 @@ stages:
       space: ${CF_SPACE}
     PORT: '80'
     DEPLOY_TYPE: red_black
-    CONTAINER_NAME: #{CF_APP}
+    CONTAINER_NAME: ${CF_APP}
     COMMAND: "#!/bin/bash\n# The following are some example deployment scripts.  Use\
       \ these as is or fork them and include your updates here:\necho -e \"${label_color}Starting\
       \ deployment script${no_color}\"\n\n\n# To view/fork this script goto: https://github.com/Osthanes/deployscripts\n\
