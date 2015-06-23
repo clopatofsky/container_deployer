@@ -23,6 +23,16 @@ export red='\e[0;31m'
 export label_color='\e[0;33m'
 export no_color='\e[0m' # No Color
 
+########################################
+# default values to build server names #
+########################################
+# beta servers
+BETA_API_PREFIX="api-ice"
+BETA_REG_PREFIX="registry-ice"
+# default servers (currently beta)
+DEF_API_PREFIX=$BETA_API_PREFIX
+DEF_REG_PREFIX=$BETA_REG_PREFIX
+
 ##################################################
 # Simple function to only run command if DEBUG=1 # 
 ### ###############################################
@@ -182,37 +192,54 @@ fi
 popd >/dev/null
 echo -e "${label_color}Successfully installed Cloud Foundry CLI ${no_color}"
 
-#################################
-# Set Bluemix Host Information  #
-#################################
-if [ -n "$BLUEMIX_TARGET" ]; then
+##########################################
+# setup bluemix env
+##########################################
+# attempt to  target env automatically
+CF_API=`cf api`
+if [ $? -eq 0 ]; then
+    # find the bluemix api host
+    export BLUEMIX_API_HOST=`echo $CF_API  | awk '{print $3}' | sed '0,/.*\/\//s///'`
+    echo $BLUEMIX_API_HOST | grep 'stage1'
+    if [ $? -eq 0 ]; then
+        # on staging, make sure bm target is set for staging
+        export BLUEMIX_TARGET="staging"
+    else
+        # on prod, make sure bm target is set for prod
+        export BLUEMIX_TARGET="prod"
+    fi
+elif [ -n "$BLUEMIX_TARGET" ]; then
+    # cf not setup yet, try manual setup
     if [ "$BLUEMIX_TARGET" == "staging" ]; then 
-        debugme echo "targetting staging environment"
-        export CCS_API_HOST="api-ice.stage1.ng.bluemix.net" 
-        export CCS_REGISTRY_HOST="registry-ice.stage1.ng.bluemix.net"
+        echo -e "Targetting staging Bluemix"
         export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
-        export ICE_CFG="ice-cfg-staging.ini"
-
     elif [ "$BLUEMIX_TARGET" == "prod" ]; then 
-        debugme echo -e "Targetting production Bluemix"
-        export CCS_API_HOST="api-ice.ng.bluemix.net" 
-        export CCS_REGISTRY_HOST="registry-ice.ng.bluemix.net"
+        echo -e "Targetting production Bluemix"
         export BLUEMIX_API_HOST="api.ng.bluemix.net"
-        export ICE_CFG="ice-cfg-prod.ini"
-
     else 
         echo -e "${red}Unknown Bluemix environment specified${no_color}" | tee -a "$ERROR_LOG_FILE"
-        ${EXT_DIR}/print_help.sh
-        exit 1
     fi 
 else 
     echo -e "Targetting production Bluemix"
-    export CCS_API_HOST="api-ice.ng.bluemix.net" 
-    export CCS_REGISTRY_HOST="registry-ice.ng.bluemix.net"
     export BLUEMIX_API_HOST="api.ng.bluemix.net"
-    export ICE_CFG="ice-cfg-prod.ini"
-
-fi  
+fi
+# strip off the hostname to get full domain
+CF_TARGET=`echo $BLUEMIX_API_HOST | sed 's/[^\.]*//'`
+if [ -z "$API_PREFIX" ]; then
+    API_PREFIX=$DEF_API_PREFIX
+fi
+if [ -z "$REG_PREFIX" ]; then
+    REG_PREFIX=$DEF_REG_PREFIX
+fi
+# build api server hostname
+export CCS_API_HOST="${API_PREFIX}${CF_TARGET}"
+# build registry server hostname
+export CCS_REGISTRY_HOST="${REG_PREFIX}${CF_TARGET}"
+# set up the ice cfg
+sed -i "s/ccs_host =.*/ccs_host = $CCS_API_HOST/g" $EXT_DIR/ice-cfg.ini
+sed -i "s/reg_host =.*/reg_host = $CCS_REGISTRY_HOST/g" $EXT_DIR/ice-cfg.ini
+sed -i "s/cf_api_url =.*/cf_api_url = $BLUEMIX_API_HOST/g" $EXT_DIR/ice-cfg.ini
+export ICE_CFG="ice-cfg.ini"
 
 ########################
 # Setup git_retry      #
