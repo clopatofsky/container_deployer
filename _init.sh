@@ -23,6 +23,21 @@ export red='\e[0;31m'
 export label_color='\e[0;33m'
 export no_color='\e[0m' # No Color
 
+########################
+# setup deploy property file #
+########################
+export DEPLOY_PROPERTY_FILE="deploy-property.sh"
+# create deploy property file.
+if [ -z ${DEPLOY_PROPERTY_FILE} ]; then
+    DEPLOY_PROPERTY_FILE="deploy-property.sh"
+fi
+if [ -f "${DEPLOY_PROPERTY_FILE}" ]; then
+    /bin/rm -f ${DEPLOY_PROPERTY_FILE}
+fi
+/bin/touch ${DEPLOY_PROPERTY_FILE}
+chmod +x $DEPLOY_PROPERTY_FILE
+echo '#!/bin/bash' >> "${DEPLOY_PROPERTY_FILE}"
+
 ########################################
 # default values to build server names #
 ########################################
