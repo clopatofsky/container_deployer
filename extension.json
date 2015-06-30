@@ -102,7 +102,9 @@ git_retry clone https://github.com/Osthanes/deployscripts.git deployscripts
 RESULT=$?
 
 # source the deploy property file
-source "$DEPLOY_PROPERTY_FILE"
+if [ -f "${DEPLOY_PROPERTY_FILE}" ]; then
+  source "$DEPLOY_PROPERTY_FILE"
+fi
 
 #########################
 # Environment DETAILS   #
