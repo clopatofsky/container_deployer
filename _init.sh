@@ -143,6 +143,8 @@ set +x
 ###############################
 if [ -n $EXT_DIR ]; then 
     export PATH=$EXT_DIR:$PATH
+else
+    export EXT_DIR=`pwd`
 fi 
 
 #########################################
@@ -152,6 +154,20 @@ if [ -z "$ERROR_LOG_FILE" ]; then
     ERROR_LOG_FILE="${EXT_DIR}/errors.log"
     export ERROR_LOG_FILE
 fi
+
+########################
+# setup deploy property file #
+########################
+# create deploy property file.
+if [ -z ${DEPLOY_PROPERTY_FILE} ]; then
+    export DEPLOY_PROPERTY_FILE="${EXT_DIR}/deploy-property.sh"
+fi
+if [ -f "${DEPLOY_PROPERTY_FILE}" ]; then
+    /bin/rm -f ${DEPLOY_PROPERTY_FILE}
+fi
+/bin/touch ${DEPLOY_PROPERTY_FILE}
+chmod +x $DEPLOY_PROPERTY_FILE
+echo '#!/bin/bash' >> "${DEPLOY_PROPERTY_FILE}"
 
 ######################
 # Install ICE CLI    #
