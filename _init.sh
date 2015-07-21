@@ -262,9 +262,10 @@ export ICE_CFG="ice-cfg.ini"
 #################################
 # Source shaell script files    #
 #################################
+source ${EXT_DIR}/git_util.sh
 source ${EXT_DIR}/utilities/ice_utils.sh
 source ${EXT_DIR}/utilities/logging_utils.sh
-source ${EXT_DIR}/git_util.sh
+
 
 ################################
 # get the extensions utilities #
