@@ -186,6 +186,7 @@ if [ $RESULT -ne 0 ]; then
         echo -e "${red}Failed to install IBM Containers CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
         debugme python --version
         ${EXT_DIR}/print_help.sh
+        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install IBM Container Service CLI. $(get_error_info)"
         exit $RESULT
     fi
     echo -e "${label_color}Successfully installed IBM Containers CLI ${no_color}"
@@ -203,6 +204,7 @@ RESULT=$?
 if [ $RESULT -ne 0 ]; then
     echo -e "${red}Could not install the Cloud Foundry CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
     ${EXT_DIR}/print_help.sh
+    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install Cloud Foundry CLI. $(get_error_info)"
     exit $RESULT
 fi  
 popd >/dev/null
@@ -257,9 +259,11 @@ sed -i "s/reg_host =.*/reg_host = $CCS_REGISTRY_HOST/g" $EXT_DIR/ice-cfg.ini
 sed -i "s/cf_api_url =.*/cf_api_url = $BLUEMIX_API_HOST/g" $EXT_DIR/ice-cfg.ini
 export ICE_CFG="ice-cfg.ini"
 
-########################
-# Setup git_retry      #
-########################
+#################################
+# Source shaell script files    #
+#################################
+source ${EXT_DIR}/utilities/ice_utils.sh
+source ${EXT_DIR}/utilities/logging_utils.sh
 source ${EXT_DIR}/git_util.sh
 
 ################################
@@ -284,11 +288,6 @@ printEnablementInfo() {
     echo -e "   - ${label_color}ice namespace set [your-desired-namespace] ${no_color}"
 }
 
-#################################
-# Source the ice_utils          #
-#################################
-source ${EXT_DIR}/utilities/ice_utils.sh
-
 ################################
 # Login to Container Service   #
 ################################
@@ -301,11 +300,13 @@ elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     # Get the Bluemix user and password information 
     if [ -z "$BLUEMIX_USER" ]; then 
         echo -e "${red} Please set BLUEMIX_USER on environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
+        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to get BLUEMIX_USER ID. $(get_error_info)"
         ${EXT_DIR}/print_help.sh
         exit 1
     fi 
     if [ -z "$BLUEMIX_PASSWORD" ]; then 
         echo -e "${red} Please set BLUEMIX_PASSWORD as an environment property environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
+        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to get BLUEMIX_PASSWORD. $(get_error_info)"
         ${EXT_DIR}/print_help.sh
         exit 1 
     fi 
@@ -342,6 +343,7 @@ if [ $RESULT -eq 1 ]; then
         printEnablementInfo        
     fi 
     ${EXT_DIR}/print_help.sh
+    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to login to IBM Container Service CLI. $(get_error_info)"
     exit $RESULT
 else 
     echo -e "${green}Successfully logged in to IBM Containers${no_color}"
@@ -368,6 +370,7 @@ if [ -z $IMAGE_NAME ]; then
         echo -e "${red}IMAGE_NAME not set. Set the IMAGE_NAME in the environment or provide a Docker build job as input to this deploy job. ${no_color}" | tee -a "$ERROR_LOG_FILE"
         echo -e "${red}If there was a recent change to the pipeline, such as deleting or moving a job or stage, check that the input to this and other later stages is still set to the correct build stage and job ${no_color}" | tee -a "$ERROR_LOG_FILE"
         ${EXT_DIR}/print_help.sh
+        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to get image name. $(get_error_info)"
         exit 1
     fi 
 else 
@@ -377,7 +380,6 @@ fi
 ############################
 # enable logging to logmet #
 ############################
-source $EXT_DIR/utilities/logging_utils.sh
 setup_met_logging "${BLUEMIX_USER}" "${BLUEMIX_PASSWORD}" "${BLUEMIX_SPACE}" "${BLUEMIX_ORG}" "${BLUEMIX_TARGET}"
 
 
