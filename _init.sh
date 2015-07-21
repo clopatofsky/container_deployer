@@ -186,7 +186,7 @@ if [ $RESULT -ne 0 ]; then
         echo -e "${red}Failed to install IBM Containers CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
         debugme python --version
         ${EXT_DIR}/print_help.sh
-        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to inatall IBM Container Service CLI. $(get_error_info)"
+        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install IBM Container Service CLI. $(get_error_info)"
         exit $RESULT
     fi
     echo -e "${label_color}Successfully installed IBM Containers CLI ${no_color}"
@@ -204,7 +204,7 @@ RESULT=$?
 if [ $RESULT -ne 0 ]; then
     echo -e "${red}Could not install the Cloud Foundry CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
     ${EXT_DIR}/print_help.sh
-    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to inatall Cloud Foundry CLI. $(get_error_info)"
+    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install Cloud Foundry CLI. $(get_error_info)"
     exit $RESULT
 fi  
 popd >/dev/null
