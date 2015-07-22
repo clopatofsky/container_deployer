@@ -155,6 +155,25 @@ if [ -z "$ERROR_LOG_FILE" ]; then
     export ERROR_LOG_FILE
 fi
 
+#################################
+# Source git_util sh file       #
+#################################
+source ${EXT_DIR}/git_util.sh
+
+################################
+# get the extensions utilities #
+################################
+pushd . >/dev/null
+cd $EXT_DIR 
+git_retry clone https://github.com/Osthanes/utilities.git utilities
+popd >/dev/null
+
+################################
+# Source utilities sh files    #
+################################
+source ${EXT_DIR}/utilities/ice_utils.sh
+source ${EXT_DIR}/utilities/logging_utils.sh
+
 ########################
 # setup deploy property file #
 ########################
@@ -258,25 +277,6 @@ sed -i "s/ccs_host =.*/ccs_host = $CCS_API_HOST/g" $EXT_DIR/ice-cfg.ini
 sed -i "s/reg_host =.*/reg_host = $CCS_REGISTRY_HOST/g" $EXT_DIR/ice-cfg.ini
 sed -i "s/cf_api_url =.*/cf_api_url = $BLUEMIX_API_HOST/g" $EXT_DIR/ice-cfg.ini
 export ICE_CFG="ice-cfg.ini"
-
-#################################
-# Source git_util sh file       #
-#################################
-source ${EXT_DIR}/git_util.sh
-
-################################
-# get the extensions utilities #
-################################
-pushd . >/dev/null
-cd $EXT_DIR 
-git_retry clone https://github.com/Osthanes/utilities.git utilities
-popd >/dev/null
-
-################################
-# Source utilities sh files    #
-################################
-source ${EXT_DIR}/utilities/ice_utils.sh
-source ${EXT_DIR}/utilities/logging_utils.sh
 
 ################################
 # Print EnablementInfo         #
