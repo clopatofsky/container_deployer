@@ -331,8 +331,8 @@ if [ -z $IMAGE_NAME ]; then
         echo "IMAGE_NAME: $IMAGE_NAME"
     fi  
     if [ -z $IMAGE_NAME ]; then
-        log_and_echo "$ERROR" "IMAGE_NAME not set. Set the IMAGE_NAME in the environment or provide a Docker build job as input to this deploy job." | tee -a "$ERROR_LOG_FILE"
-        log_and_echo "$ERROR" "If there was a recent change to the pipeline, such as deleting or moving a job or stage, check that the input to this and other later stages is still set to the correct build stage and job." | tee -a "$ERROR_LOG_FILE"
+        log_and_echo "$ERROR" "IMAGE_NAME not set. Set the IMAGE_NAME in the environment or provide a Docker build job as input to this deploy job."
+        log_and_echo "$ERROR" "If there was a recent change to the pipeline, such as deleting or moving a job or stage, check that the input to this and other later stages is still set to the correct build stage and job."
         ${EXT_DIR}/print_help.sh
         ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to get image name. $(get_error_info)"
         exit 1
