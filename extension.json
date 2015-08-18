@@ -12,7 +12,8 @@
         },
         {
             "type": "Bluemix",
-            "inclusion" : "always"
+            "inclusion" : "always",
+            "regions": ["ibm:ys1:us-south", "ibm:yp:us-south"]
         }
     ],
     "params": [
