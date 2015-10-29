@@ -133,7 +133,7 @@ echo -e \"${green}Execution complete${no_label}\"",
         "type": "JenkinsDocker",
         "shell": "#!/bin/bash
 set +x
-
+set +e
 export INIT_START_TIME=$(date +\"%s\")
 export DEPLOY_TYPE=#DEPLOY_TYPE#
 export CONTAINER_NAME=#CONTAINER_NAME#
