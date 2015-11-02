@@ -157,7 +157,7 @@ cat >> script.sh << '__EOF__'
 __EOF__
 # set to fail if script.sh fails
 set -e
-/bin/bash -e script.sh"
+/bin/bash script.sh"
     }
     },
     "project": "https://hub.jazz.net/project/rjminsha/pipeline_service_docker_deployer_ice",
