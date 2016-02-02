@@ -166,7 +166,7 @@ source ${EXT_DIR}/git_util.sh
 ################################
 pushd . >/dev/null
 cd $EXT_DIR 
-git_retry clone https://github.com/Osthanes/utilities.git utilities
+git_retry clone -b bahram-cfic https://github.com/Osthanes/utilities.git utilities
 popd >/dev/null
 
 ################################
@@ -189,10 +189,32 @@ fi
 chmod +x $DEPLOY_PROPERTY_FILE
 echo '#!/bin/bash' >> "${DEPLOY_PROPERTY_FILE}"
 
-######################
-# Install ICE CLI    #
-######################
-echo "Installing IBM Container Service CLI"
+#############################
+# Install Cloud Foundry CLI #
+#############################
+CF_VER=$(cf -v)
+log_and_echo "$INFO" "Existing Cloud Foundry CLI ${CF_VER}"
+log_and_echo "$INFO" "Installing Cloud Foundry CLI"
+pushd $EXT_DIR >/dev/null
+gunzip cf-linux-amd64.tgz &> /dev/null
+tar -xvf cf-linux-amd64.tar  &> /dev/null
+cf help &> /dev/null
+RESULT=$?
+if [ $RESULT -ne 0 ]; then
+    log_and_echo "$ERROR" "Could not install the Cloud Foundry CLI"
+    ${EXT_DIR}/print_help.sh
+    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install Cloud Foundry CLI. $(get_error_info)"
+    exit $RESULT
+fi
+CF_VER=$(cf -v)
+popd >/dev/null
+log_and_echo "$LABEL" "Successfully installed Cloud Foundry CLI ${CF_VER}"
+
+#####################################
+# Install IBM Container Service CLI #
+#####################################
+# Install ICE CLI
+log_and_echo "$INFO" "Installing IBM Container Service CLI"
 ice help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
@@ -203,32 +225,31 @@ if [ $RESULT -ne 0 ]; then
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
-        echo -e "${red}Failed to install IBM Containers CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
+        log_and_echo "$ERROR" "Failed to install IBM Container Service CLI"
         debugme python --version
-        ${EXT_DIR}/print_help.sh
-        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install IBM Container Service CLI. $(get_error_info)"
-        exit $RESULT
+        if [ "$USE_ICE_CLI" = "1" ]; then
+            ${EXT_DIR}/print_help.sh
+            ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install IBM Container Service CLI. $(get_error_info)"
+            exit $RESULT
+        fi
+    else
+        log_and_echo "$LABEL" "Successfully installed IBM Container Service CLI"
     fi
-    echo -e "${label_color}Successfully installed IBM Containers CLI ${no_color}"
 fi 
 
-#############################
-# Install Cloud Foundry CLI #
-#############################
-echo "Installing Cloud Foundry CLI"
-pushd $EXT_DIR >/dev/null
-gunzip cf-linux-amd64.tgz &> /dev/null
-tar -xvf cf-linux-amd64.tar  &> /dev/null
-cf help &> /dev/null
-RESULT=$?
-if [ $RESULT -ne 0 ]; then
-    echo -e "${red}Could not install the Cloud Foundry CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
-    ${EXT_DIR}/print_help.sh
-    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install Cloud Foundry CLI. $(get_error_info)"
-    exit $RESULT
-fi  
-popd >/dev/null
-echo -e "${label_color}Successfully installed Cloud Foundry CLI ${no_color}"
+#############################################
+# Install the IBM Containers plug-in (cf ic) #
+#############################################
+if [ "$USE_ICE_CLI" != "1" ]; then
+    export IC_COMMAND="${EXT_DIR}/cf ic"
+    install_cf_ic
+    RESULT=$?
+    if [ $RESULT -ne 0 ]; then
+        exit $RESULT
+    fi
+else
+    export IC_COMMAND="ice"
+fi
 
 ##########################################
 # setup bluemix env
@@ -294,7 +315,7 @@ export ICE_CFG="ice-cfg.ini"
 ################################
 login_to_container_service
 RESULT=$?
-if [ $RESULT -ne 0 ]; then
+if [ $RESULT -ne 0 ] && [ "$USE_ICE_CLI" = "1" ]; then
     exit $RESULT
 fi
 
@@ -308,11 +329,11 @@ if [ $RESULT -ne 0 ]; then
 fi
 
 ################################
-# Login to Container Service   #
+# Get the namespace            #
 ################################
 get_name_space
 RESULT=$?
-    if [ $RESULT -ne 0 ]; then
+if [ $RESULT -ne 0 ]; then
     exit $RESULT
 fi 
 
