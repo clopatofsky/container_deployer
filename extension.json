@@ -164,8 +164,6 @@ __EOF__
 # call the script in a subscript
 /bin/bash -e script.sh
 PIPE_SCR_RESULT=$?
-echo \"bahram\"
-ls
 # restore the saved exported vars
 source $EXT_DIR/save_vars.sh
 if [ $PIPE_SCR_RESULT -ne 0 ]; then
