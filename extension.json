@@ -155,8 +155,8 @@ echo -e \"Init runtime of `date -u -d @\"$INIT_EST_TIME\" +\'%-Mm %-Ss\'`\"
 cat > script.sh << '__EOF__'
 #!/bin/bash
 function save_env_vars_on_exit() {
-    echo \"#!/bin/bash\" > $EXT_DIR/save_vars.sh
-    export -p >> $EXT_DIR/save_vars.sh
+    echo \"#!/bin/bash\" > "$EXT_DIR/save_vars.sh"
+    export -p >> "$EXT_DIR/save_vars.sh"
 }
 trap \"save_env_vars_on_exit\" EXIT
 #COMMAND#
@@ -164,6 +164,8 @@ __EOF__
 # call the script in a subscript
 /bin/bash -e script.sh
 PIPE_SCR_RESULT=$?
+echo "bahram"
+ls
 # restore the saved exported vars
 source $EXT_DIR/save_vars.sh
 if [ $PIPE_SCR_RESULT -ne 0 ]; then
